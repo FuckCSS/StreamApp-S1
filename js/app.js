@@ -84,7 +84,17 @@ let browsePage       = 1;
 let browseTotalPages = 1;
 
 // ---- localStorage helpers ----
-function getSavedSource()    { return localStorage.getItem('sa_source') || 'alpha'; }
+function getSavedSource() {
+  let source = localStorage.getItem('sa_source');
+
+  // If they have no source saved, OR if they are still on the old 'alpha'
+  if (!source || source === 'alpha') {
+    source = 'november';
+    localStorage.setItem('sa_source', 'november');
+  }
+
+  return source;
+}
 function saveSource(v)       { localStorage.setItem('sa_source', v); }
 function isUblockDismissed() { return localStorage.getItem('sa_ublock') === '1'; }
 function dismissUblock()     { localStorage.setItem('sa_ublock', '1'); }
@@ -315,44 +325,17 @@ function renderCW() {
 // ============================================================
 // Discover
 // ============================================================
-let discoverLoaded = false;
-async function loadDiscoverContent() {
-  if (discoverLoaded) return;
-  discoverLoaded = true;
-
-  genreChips.innerHTML = '';
-  GENRES.forEach(g => {
-    const chip = document.createElement('a');
-    chip.href      = `#/genre/${g.id}`;
-    chip.className = 'genre-chip';
-    chip.textContent = g.name;
-    genreChips.appendChild(chip);
-  });
-
-  try {
-    const [trending, topMovies, popularTV] = await Promise.all([
-      tmdbFetch('/trending/all/week'),
-      tmdbFetch('/movie/top_rated'),
-      tmdbFetch('/tv/popular'),
-    ]);
-    renderDiscoverRow('row-trending',    trending.results   || []);
-    renderDiscoverRow('row-top-movies',  topMovies.results  || []);
-    renderDiscoverRow('row-popular-tv',  popularTV.results  || [], 'tv');
-  } catch (err) {
-    console.error('Discover load error:', err);
-  }
-}
-
-function renderDiscoverRow(containerId, items, forceType) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
-  items.slice(0, 20).forEach(item => {
-    const type   = forceType || item.media_type || 'movie';
-    const title  = type === 'tv' ? item.name : item.title;
+function renderDiscoverRow(rowId, items, forcedType) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  row.innerHTML = '';
+  items.forEach(item => {
+    const isTV  = forcedType ? forcedType === 'tv' : item.media_type === 'tv';
+    const title = isTV ? (item.name || item.title) : (item.title || item.name);
+    const date  = isTV ? item.first_air_date : item.release_date;
+    const year  = date ? date.slice(0, 4) : '';
     const poster = item.poster_path ? `${IMG_BASE}${item.poster_path}` : null;
-    const year   = (item.release_date || item.first_air_date || '').slice(0, 4);
-    const isTV   = type === 'tv';
+    const target = isTV ? `#/tv/${item.id}/1/1` : `#/movie/${item.id}`;
 
     const card = document.createElement('div');
     card.className = 'disc-card';
@@ -360,39 +343,98 @@ function renderDiscoverRow(containerId, items, forceType) {
       <div class="disc-card-poster">
         ${poster
           ? `<img src="${poster}" alt="${escapeHtml(title)}" loading="lazy" />`
-          : `<div class="disc-card-ph">${escapeHtml(title)}</div>`
+          : `<div class="card-placeholder">${escapeHtml(title)}</div>`
         }
         <div class="card-type-badge ${isTV ? 'badge-tv' : 'badge-movie'}">${isTV ? 'TV' : 'Movie'}</div>
       </div>
-      <div class="card-body">
-        <div class="card-title">${escapeHtml(title)}</div>
-        ${year ? `<div class="card-year">${year}</div>` : ''}
-      </div>
+      <div class="disc-card-title">${escapeHtml(title)}</div>
+      ${year ? `<div class="disc-card-year">${year}</div>` : ''}
     `;
-    const target = isTV ? `#/tv/${item.id}/1/1` : `#/movie/${item.id}`;
     card.addEventListener('click', () => { window.location.hash = target; });
-    container.appendChild(card);
+    row.appendChild(card);
   });
 }
 
+let discoverLoaded = false;
+async function loadDiscoverContent() {
+  if (discoverLoaded) return;
+  discoverLoaded = true;
+
+  // Render genre chips
+  genreChips.innerHTML = '';
+  GENRES.forEach(g => {
+    const chip = document.createElement('a');
+    chip.href = `#/genre/${g.id}`;
+    chip.className = 'genre-chip';
+    chip.textContent = g.name;
+    genreChips.appendChild(chip);
+  });
+
+  try {
+    const [
+      trendingToday, trendingWeek, nowPlaying,
+      upcoming, popularMovies, topMovies,
+      popularTV, topTV, airingToday, onAir
+    ] = await Promise.all([
+      tmdbFetch('/trending/all/day'),
+      tmdbFetch('/trending/all/week'),
+      tmdbFetch('/movie/now_playing'),
+      tmdbFetch('/movie/upcoming'),
+      tmdbFetch('/movie/popular'),
+      tmdbFetch('/movie/top_rated'),
+      tmdbFetch('/tv/popular'),
+      tmdbFetch('/tv/top_rated'),
+      tmdbFetch('/tv/airing_today'),
+      tmdbFetch('/tv/on_the_air'),
+    ]);
+
+    renderDiscoverRow('row-trending-today', trendingToday.results  || []);
+    renderDiscoverRow('row-trending',       trendingWeek.results   || []);
+    renderDiscoverRow('row-now-playing',    nowPlaying.results     || [], 'movie');
+    renderDiscoverRow('row-upcoming',       upcoming.results       || [], 'movie');
+    renderDiscoverRow('row-popular-movies', popularMovies.results  || [], 'movie');
+    renderDiscoverRow('row-top-movies',     topMovies.results      || [], 'movie');
+    renderDiscoverRow('row-popular-tv',     popularTV.results      || [], 'tv');
+    renderDiscoverRow('row-top-tv',         topTV.results          || [], 'tv');
+    renderDiscoverRow('row-airing-today',   airingToday.results    || [], 'tv');
+    renderDiscoverRow('row-on-air',         onAir.results          || [], 'tv');
+  } catch (err) {
+    console.error('Discover load error:', err);
+  }
+}
 // ============================================================
 // Browse (full grid for category/genre)
 // ============================================================
 function getBrowseLabel(type, param) {
-  if (type === 'trending')   return '🔥 Trending This Week';
-  if (type === 'top-movies') return '⭐ Top Rated Movies';
-  if (type === 'popular-tv') return '📺 Popular TV Shows';
+  if (type === 'trending-today') return '🔥 Trending Today';
+  if (type === 'trending')       return '📅 Trending This Week';
+  if (type === 'now-playing')    return '🎬 Now Playing';
+  if (type === 'upcoming')       return '🗓️ Upcoming Movies';
+  if (type === 'popular-movies') return '🍿 Popular Movies';
+  if (type === 'top-movies')     return '⭐ Top Rated Movies';
+  if (type === 'popular-tv')     return '📺 Popular TV Shows';
+  if (type === 'top-tv')         return '🏆 Top Rated TV Shows';
+  if (type === 'airing-today')   return '📡 Airing Today';
+  if (type === 'on-air')         return '📻 Currently On Air';
   if (type === 'genre') {
     const g = GENRES.find(x => String(x.id) === String(param));
     return g ? g.name : 'Genre';
   }
   return 'Browse';
 }
+
 function getBrowseUrl(type, param, page) {
-  if (type === 'trending')   return `/trending/all/week?page=${page}`;
-  if (type === 'top-movies') return `/movie/top_rated?page=${page}`;
-  if (type === 'popular-tv') return `/tv/popular?page=${page}`;
-  if (type === 'genre')      return `/discover/movie?with_genres=${param}&sort_by=popularity.desc&page=${page}`;
+  if (type === 'trending-today') return `/trending/all/day?page=${page}`;
+  if (type === 'trending')       return `/trending/all/week?page=${page}`;
+  if (type === 'now-playing')    return `/movie/now_playing?page=${page}`;
+  if (type === 'upcoming')       return `/movie/upcoming?page=${page}`;
+  if (type === 'popular-movies') return `/movie/popular?page=${page}`;
+  if (type === 'top-movies')     return `/movie/top_rated?page=${page}`;
+  if (type === 'popular-tv')     return `/tv/popular?page=${page}`;
+  if (type === 'top-tv')         return `/tv/top_rated?page=${page}`;
+  if (type === 'airing-today')   return `/tv/airing_today?page=${page}`;
+  if (type === 'on-air')         return `/tv/on_the_air?page=${page}`;
+  if (type === 'genre')          return `/discover/movie?with_genres=${param}&sort_by=popularity.desc&page=${page}`;
   return null;
 }
 async function loadBrowsePage(reset) {
@@ -598,9 +640,10 @@ function renderEpisodes(episodes, highlightEp) {
 
 // ============================================================
 // Player
+
 // ============================================================
 function buildSrc() {
-  const src = SOURCES[sourceSelect.value] || SOURCES.alpha;
+  const src = SOURCES[sourceSelect.value] || SOURCES.november;
   if (activeType === 'tv') return src.tv(activeMediaId, activeSeason, activeEpisode);
   return src.movie(activeMediaId);
 }

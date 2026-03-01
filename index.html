@@ -132,7 +132,7 @@
           <div class="source-row-group server-group">
             <label for="media-source-select">Server</label>
             <select id="media-source-select" class="server-select">
-              <option value="alpha">Alpha (Recommended)</option>
+              <option value="alpha">Alpha</option>
               <option value="bravo">Bravo</option>
               <option value="charlie">Charlie</option>
               <option value="delta">Delta</option>
@@ -145,7 +145,7 @@
               <option value="kilo">Kilo</option>
               <option value="lima">Lima</option>
               <option value="mike">Mike</option>
-              <option value="november">November</option>
+              <option value="november">November (recommended)</option>
               <option value="oscar">Oscar</option>
               <option value="papa">Papa</option>
               <option value="quebec">Quebec</option>
@@ -193,11 +193,51 @@
 
       <div class="discover-section">
         <div class="discover-section-header">
-          <span class="discover-section-title">🔥 Trending This Week</span>
+          <span class="discover-section-title">🔥 Trending Today</span>
+          <a href="#/browse/trending-today" class="discover-view-all">View All →</a>
+        </div>
+        <div class="discover-row-wrap">
+          <div id="row-trending-today" class="discover-row"></div>
+        </div>
+      </div>
+
+      <div class="discover-section">
+        <div class="discover-section-header">
+          <span class="discover-section-title">📅 Trending This Week</span>
           <a href="#/browse/trending" class="discover-view-all">View All →</a>
         </div>
         <div class="discover-row-wrap">
           <div id="row-trending" class="discover-row"></div>
+        </div>
+      </div>
+
+      <div class="discover-section">
+        <div class="discover-section-header">
+          <span class="discover-section-title">🎬 Now Playing</span>
+          <a href="#/browse/now-playing" class="discover-view-all">View All →</a>
+        </div>
+        <div class="discover-row-wrap">
+          <div id="row-now-playing" class="discover-row"></div>
+        </div>
+      </div>
+
+      <div class="discover-section">
+        <div class="discover-section-header">
+          <span class="discover-section-title">🗓️ Upcoming Movies</span>
+          <a href="#/browse/upcoming" class="discover-view-all">View All →</a>
+        </div>
+        <div class="discover-row-wrap">
+          <div id="row-upcoming" class="discover-row"></div>
+        </div>
+      </div>
+
+      <div class="discover-section">
+        <div class="discover-section-header">
+          <span class="discover-section-title">🍿 Popular Movies</span>
+          <a href="#/browse/popular-movies" class="discover-view-all">View All →</a>
+        </div>
+        <div class="discover-row-wrap">
+          <div id="row-popular-movies" class="discover-row"></div>
         </div>
       </div>
 
@@ -218,6 +258,36 @@
         </div>
         <div class="discover-row-wrap">
           <div id="row-popular-tv" class="discover-row"></div>
+        </div>
+      </div>
+
+      <div class="discover-section">
+        <div class="discover-section-header">
+          <span class="discover-section-title">🏆 Top Rated TV Shows</span>
+          <a href="#/browse/top-tv" class="discover-view-all">View All →</a>
+        </div>
+        <div class="discover-row-wrap">
+          <div id="row-top-tv" class="discover-row"></div>
+        </div>
+      </div>
+
+      <div class="discover-section">
+        <div class="discover-section-header">
+          <span class="discover-section-title">📡 Airing Today</span>
+          <a href="#/browse/airing-today" class="discover-view-all">View All →</a>
+        </div>
+        <div class="discover-row-wrap">
+          <div id="row-airing-today" class="discover-row"></div>
+        </div>
+      </div>
+
+      <div class="discover-section">
+        <div class="discover-section-header">
+          <span class="discover-section-title">📻 Currently On Air</span>
+          <a href="#/browse/on-air" class="discover-view-all">View All →</a>
+        </div>
+        <div class="discover-row-wrap">
+          <div id="row-on-air" class="discover-row"></div>
         </div>
       </div>
 
