@@ -818,7 +818,7 @@ input, select { font-family: inherit; }
 ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #374151; }
 /* ============================================================
-   StreamApp — styles.css ADDITIONS
+   FluxusTV — styles.css ADDITIONS
    Player overlay & iframe container
    ============================================================ */
 
@@ -991,7 +991,7 @@ input, select { font-family: inherit; }
   .player-header { flex-wrap: wrap; }
 }
 /* ============================================================
-   StreamApp — styles.css ADDITIONS
+   FluxusTV — styles.css ADDITIONS
    Media page, episode grid, season tabs, uBlock banner
    ============================================================ */
 
@@ -1430,7 +1430,7 @@ input, select { font-family: inherit; }
   }
 }
 /* ============================================================
-   StreamApp — Discover, Browse & Genre additions
+   FluxusTV — Discover, Browse & Genre additions
    Append to the END of css/styles.css
    ============================================================ */
 

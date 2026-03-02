@@ -1,4 +1,4 @@
-# StreamApp
+# FluxusTV
 
 A static frontend for searching and streaming movies and TV shows.
 

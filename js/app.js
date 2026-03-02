@@ -1,5 +1,5 @@
 /* ============================================================
-   StreamApp — app.js
+   FluxusTV — app.js
    Hash-based SPA: Search → Discover → Genre/Browse → Movie/TV
    ============================================================ */
 const TMDB_KEY = '3d421899d5ce93db8ad4ae4591ccc130';
@@ -206,14 +206,14 @@ function showSearchView() {
   viewSearch.classList.remove('hidden');
   playerIframe.src = '';
   activeMediaId = null;
-  document.title = 'StreamApp — Watch Movies & TV';
+  document.title = 'FluxusTV — Watch Movies & TV';
   window.scrollTo(0, 0);
   renderCW();
 }
 function showDiscoverView() {
   viewDiscover.classList.remove('hidden');
   navDiscover.classList.add('active');
-  document.title = 'Discover — StreamApp';
+  document.title = 'Discover — FluxusTV';
   window.scrollTo(0, 0);
   loadDiscoverContent();
 }
@@ -226,7 +226,7 @@ function showBrowseView(category, param) {
   window.scrollTo(0, 0);
   const label = getBrowseLabel(category, param);
   browseTitle.textContent = label;
-  document.title = `${label} — StreamApp`;
+  document.title = `${label} — FluxusTV`;
   loadBrowsePage(true);
 }
 async function showMediaView(type, id, s = 1, e = 1) {
@@ -535,7 +535,7 @@ function renderMediaHeader(type, detail) {
   const rating = detail.vote_average ? detail.vote_average.toFixed(1) : null;
   const genres = (detail.genres || []).map(g => g.name).join(', ');
 
-  document.title = `${title} — StreamApp`;
+  document.title = `${title} — FluxusTV`;
 
   if (poster) {
     mediaPoster.src = poster;

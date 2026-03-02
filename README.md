@@ -1,4 +1,4 @@
-# StreamApp
+# FluxusTV
 
 A simple frontend to search movies and TV shows. Uses TMDB API for metadata. Videos open on external providers.
 
